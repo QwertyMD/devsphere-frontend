@@ -1,55 +1,77 @@
-import { getAllMembers } from "@/services/admin/memberServices";
-import { Member } from "@/types/member.types";
-import { useEffect, useState } from "react";
-import MemberCard from "@/components/MemberCard";
+import { useEffect, useState } from 'react';
+import { getAllMembers } from '@/services/admin/memberServices';
+import type { Member } from '@/types/member.types';
+import MemberCard from '@/components/MemberCard';
+import SectionHeading from '@/components/user/SectionHeading';
+import Reveal from '@/components/user/Reveal';
 
-const MemberUserCard = () => {
+function MemberSkeleton() {
+  return (
+    <div className="flex animate-pulse flex-col items-center rounded-2xl border border-slate-200 bg-white px-6 py-8">
+      <div className="h-32 w-32 rounded-2xl bg-slate-100" />
+      <div className="mt-5 h-5 w-2/3 rounded bg-slate-100" />
+      <div className="mt-2 h-4 w-1/3 rounded bg-slate-100" />
+    </div>
+  );
+}
+
+const MemberUserCard = ({ hideHeading = false, showAll = false }: { hideHeading?: boolean; showAll?: boolean }) => {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
     const fetchMembers = async () => {
       try {
         const data = await getAllMembers();
-        const active = data.filter((m) => m.status === "ACTIVE");
-        setMembers(active);
-      } catch (error) {
-        console.error("Failed to fetch members", error);
+        if (mounted) setMembers(data.filter((m) => m.status === 'ACTIVE'));
+      } catch {
+        if (mounted) setMembers([]);
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
-
     fetchMembers();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  if (loading) return <p className="text-center py-10">Loading members...</p>;
-  if (!members.length) return <p className="text-center py-10">No members found.</p>;
+  const visible = showAll ? members : members.slice(0, 8);
 
   return (
-    <section>
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-3">
-          <span className="block h-px w-6 bg-red-700" />
-          <h2 className="text-xs font-bold tracking-widest uppercase text-red-700">
-            Team
-          </h2>
+    <div>
+      {!hideHeading && (
+        <SectionHeading
+          eyebrow="Team"
+          title="Meet our people"
+          description="The ones running workshops, reviewing PRs, and keeping the Discord alive."
+        />
+      )}
+
+      {loading ? (
+        <div className="mt-10 grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <MemberSkeleton key={i} />
+          ))}
         </div>
-        <h3 className="text-3xl font-bold text-slate-900 md:text-4xl">
-          Meet Our People
-        </h3>
-      </div>
-      <div className="flex flex-wrap justify-between gap-x-8 gap-y-12 sm:gap-x-16 md:gap-x-20 pb-12 md:pb-24 pt-4">
-        {members.map((member, index) => (
-          <div 
-            key={member.id} 
-            className={index % 2 !== 0 ? "translate-y-8 md:translate-y-16" : ""}
-          >
-            <MemberCard member={member} />
-          </div>
-        ))}
-      </div>
-    </section>
+      ) : members.length === 0 ? (
+        <div className="mt-10 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-8 py-14 text-center">
+          <p className="font-heading text-lg font-semibold text-slate-900">No members to show yet</p>
+          <p className="mx-auto mt-2 max-w-md text-sm text-slate-600">
+            We're updating the roster. Check back soon.
+          </p>
+        </div>
+      ) : (
+        <div className="mt-10 grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
+          {visible.map((member, i) => (
+            <Reveal key={member.id} delay={Math.min(i % 4, 3) * 80} className="h-full">
+              <MemberCard member={member} />
+            </Reveal>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 

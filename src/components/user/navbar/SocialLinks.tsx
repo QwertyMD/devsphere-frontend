@@ -1,4 +1,5 @@
 import { socialLinks } from './navbarData';
+import { cn } from '@/lib/utils';
 
 interface SocialLinksProps {
   className?: string;
@@ -6,15 +7,15 @@ interface SocialLinksProps {
 
 const SocialLinks = ({ className }: SocialLinksProps) => {
   return (
-    <div className={`flex items-center gap-4 ${className}`}>
-      {socialLinks.map(({ href, icon, label }, idx) => (
+    <div className={cn('flex items-center gap-2', className)}>
+      {socialLinks.map(({ href, icon, label }) => (
         <a
-          key={`social-item-${idx}`}
+          key={label}
           href={href}
           target="_blank"
           rel="noopener noreferrer"
           aria-label={label}
-          className="text-2xl transition-transform hover:scale-110 text-red-700"
+          className="grid h-9 w-9 place-items-center rounded-full text-lg text-slate-500 transition hover:-translate-y-0.5 hover:bg-red-700/[0.08] hover:text-red-700"
         >
           {icon}
         </a>

@@ -1,0 +1,102 @@
+@layer components {
+  .grid-bg {
+    background-image:
+      linear-gradient(to right, rgb(15 23 42 / 0.055) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(15 23 42 / 0.055) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
+  .grid-bg-animated {
+    animation: grid-pan 22s linear infinite;
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition:
+      opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .card-lift {
+    transition:
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.35s ease,
+      border-color 0.35s ease;
+  }
+
+  .card-lift:hover {
+    transform: translateY(-6px);
+  }
+
+  .hero-motion-content {
+    position: relative;
+    transform-origin: top;
+    transform: translateY(calc(var(--hero-progress) * -64px))
+      scale(calc(1 - (var(--hero-progress) * 0.04)));
+    will-change: transform;
+  }
+
+  .hero-motion-rocket {
+    will-change: transform, opacity;
+  }
+
+  .hero-motion-rocket-left {
+    transform:
+      translateY(calc(var(--hero-progress) * -220px))
+      translateX(calc(var(--hero-progress) * -36px))
+      rotate(calc(-14deg - (var(--hero-progress) * 12deg)));
+    opacity: calc(1 - (var(--hero-progress) * 0.6));
+  }
+
+  .hero-motion-rocket-right {
+    transform:
+      translateY(calc(var(--hero-progress) * -260px))
+      translateX(calc(var(--hero-progress) * 36px))
+      rotate(calc(14deg + (var(--hero-progress) * 12deg)));
+    opacity: calc(1 - (var(--hero-progress) * 0.6));
+  }
+
+  .hero-motion-gallery {
+    transform: translateY(calc(var(--hero-progress) * -30px));
+    will-change: transform;
+  }
+
+  .hero-motion-panel {
+    transform: translateY(calc((1 - var(--hero-progress)) * 48px));
+    box-shadow: 0 -24px 60px rgba(15, 23, 42, calc(var(--hero-progress) * 0.12));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grid-bg-animated,
+  .animate-float-slow,
+  .animate-float-slower,
+  .animate-marquee {
+    animation: none !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .hero-motion-content,
+  .hero-motion-gallery,
+  .hero-motion-rocket-left,
+  .hero-motion-rocket-right,
+  .hero-motion-panel {
+    transform: none;
+    opacity: 1;
+    filter: none;
+    box-shadow: none;
+  }
+}
